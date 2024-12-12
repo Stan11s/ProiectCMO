@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
 
     private static final int REQ_ONE_TAP = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         statusMessage = findViewById(R.id.statusMessage);
         signUpButton = findViewById(R.id.signUpButton);
+
 
         //PENTRU GOOGLE AUTENTIFICARE
         oneTapClient = Identity.getSignInClient(this);
@@ -62,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
-
         signInRequest = BeginSignInRequest.builder()
                 .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
                         .setSupported(true)
@@ -70,10 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                         .setSupported(true)
                         .setServerClientId("802966616072-8t320q29gsi7t69ct3cm60d4lvijos74.apps.googleusercontent.com")
-                        .setFilterByAuthorizedAccounts(false)
+                        .setFilterByAuthorizedAccounts(false) // Permite toate conturile
                         .build())
                 .setAutoSelectEnabled(false)
-
                 .build();
         // Navigare către SignUpActivity
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -91,26 +91,58 @@ public class MainActivity extends AppCompatActivity {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
-                // Obținem datele salvate în SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 String savedUsername = sharedPreferences.getString("username", null);
                 String savedPassword = sharedPreferences.getString("password", null);
 
-                // Verificăm dacă datele introduse corespund celor salvate
                 if (username.equals(savedUsername) && password.equals(savedPassword)) {
                     statusMessage.setText("Login Successful");
                     statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+
+                    // Salvăm starea autentificării
+                    sharedPreferences.edit().putBoolean("isLoggedIn", true).apply();
+
+                    navigateToWelcomePage(username);
                 } else {
                     statusMessage.setText("Invalid Credentials");
                     statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                 }
             }
         });
+
+        // Verificăm dacă utilizatorul este deja autentificat
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+        String username = sharedPreferences.getString("username", "");
+
+        if (isLoggedIn) {
+            navigateToWelcomePage(username);
+            return;
+        }
     }
+
+    private void navigateToWelcomePage(String username) {
+        Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+        intent.putExtra("username", username);
+        startActivity(intent);
+        finish(); // Opțional: pentru a preveni revenirea la ecranul de login
+    }
+
     public void buttonGoogleSignIn(View view) {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, REQ_ONE_TAP); // Folosește REQ_ONE_TAP pentru consistență
+        // Șterge datele din preferințe
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+
+        googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            googleSignInClient.revokeAccess().addOnCompleteListener(this, revokeTask -> {
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, REQ_ONE_TAP);
+            });
+        });
     }
+
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -122,12 +154,16 @@ public class MainActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
 
                 if (account != null) {
-                    String idToken = account.getIdToken();
                     String email = account.getEmail();
-                    Log.d(TAG, "Google Sign-In successful. Email: " + email + " Token: " + idToken);
 
-                    statusMessage.setText("Login successful!");
-                    statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                    // Salvăm starea autentificării
+                    SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    sharedPreferences.edit()
+                            .putBoolean("isLoggedIn", true)
+                            .putString("username", email)
+                            .apply();
+
+                    navigateToWelcomePage(email);
                 }
             } catch (ApiException e) {
                 Log.e(TAG, "Google Sign-In failed.", e);

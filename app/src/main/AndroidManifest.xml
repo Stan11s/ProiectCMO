@@ -29,6 +29,7 @@
 
         <!-- Activitatea de înregistrare -->
         <activity android:name="com.example.poriectcmocheltuieli.SignUpActivity" />
+        <activity android:name="com.example.poriectcmocheltuieli.WelcomeActivity" />
     </application>
 
 </manifest>
