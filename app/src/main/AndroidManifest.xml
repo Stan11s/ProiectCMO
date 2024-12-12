@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.poriectcmocheltuieli"> <!-- Numele pachetului aplicatiei -->
+    package="com.example.poriectcmocheltuieli">
 
     <!-- Permisiuni necesare -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -11,6 +11,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.PoriectCMOCheltuieli">
+
+        <!-- Configurarea Google Sign-In -->
+        <meta-data
+            android:name="com.google.android.gms.client_id"
+            android:value="802966616072-8t320q29gsi7t69ct3cm60d4lvijos74.apps.googleusercontent.com" />
 
         <!-- Activitatea principală care este lansată prima -->
         <activity
@@ -24,7 +29,6 @@
 
         <!-- Activitatea de înregistrare -->
         <activity android:name="com.example.poriectcmocheltuieli.SignUpActivity" />
-
     </application>
 
 </manifest>

@@ -20,9 +20,14 @@ import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 public class MainActivity extends AppCompatActivity {
     private SignInClient oneTapClient;
@@ -31,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView statusMessage;
     private Button signUpButton;
+    private GoogleSignInClient googleSignInClient;
+
     private static final int REQ_ONE_TAP = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +52,28 @@ public class MainActivity extends AppCompatActivity {
 
         //PENTRU GOOGLE AUTENTIFICARE
         oneTapClient = Identity.getSignInClient(this);
+        // Configurarea GoogleSignInOptions
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("802966616072-27b4corqpdc30j5amqv4og32mmdoe5ht.apps.googleusercontent.com") // ID-ul Clientului OAuth 2.0
+                .requestEmail()
+                .build();
+
+        // Inițializează variabila globală googleSignInClient
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+
         signInRequest = BeginSignInRequest.builder()
                 .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
                         .setSupported(true)
                         .build())
                 .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                         .setSupported(true)
-                        // Your server's client ID, not your Android client ID.
-                        .setServerClientId("802966616072-8t320q29gsi7t69ct3cm60d4lvijos74.apps.googleusercontent.com")//TODO
-                        // Only show accounts previously used to sign in.
+                        .setServerClientId("802966616072-8t320q29gsi7t69ct3cm60d4lvijos74.apps.googleusercontent.com")
                         .setFilterByAuthorizedAccounts(false)
                         .build())
-                // Automatically sign in when exactly one credential is retrieved.
-                .setAutoSelectEnabled(true)
+                .setAutoSelectEnabled(false)
+
                 .build();
         // Navigare către SignUpActivity
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -91,57 +107,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    public void buttonGoogleSignIn(View view)
-    {
-        oneTapClient.beginSignIn(signInRequest)
-                .addOnSuccessListener(this, new OnSuccessListener<BeginSignInResult>() {
-                    @Override
-                    public void onSuccess(BeginSignInResult result) {
-                        try {
-                            startIntentSenderForResult(
-                                    result.getPendingIntent().getIntentSender(), REQ_ONE_TAP,
-                                    null, 0, 0, 0);
-                        } catch (IntentSender.SendIntentException e) {
-                            Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
-                        }
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // No saved credentials found. Launch the One Tap sign-up flow, or
-                        // do nothing and continue presenting the signed-out UI.
-                        Log.d(TAG, e.getLocalizedMessage());
-                    }
-                });
+    public void buttonGoogleSignIn(View view) {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, REQ_ONE_TAP); // Folosește REQ_ONE_TAP pentru consistență
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case REQ_ONE_TAP:
-                try {
-                    SignInCredential credential = oneTapClient.getSignInCredentialFromIntent(data);
-                    String idToken = credential.getGoogleIdToken();
-                    String username = credential.getId();
-                    String password = credential.getPassword();
-                    statusMessage.setText("NICE");
-                    if (idToken !=  null) {
-                        // Got an ID token from Google. Use it to authenticate
-                        // with your backend.
-                        Log.d(TAG, "Got ID token.");
-                    } else if (password != null) {
-                        // Got a saved username and password. Use them to authenticate
-                        // with your backend.
-                        Log.d(TAG, "Got password.");
-                    }
-                } catch (ApiException e) {
-                    // ...
-                    statusMessage.setText("Huinea ebanaua");
-                    Log.d(TAG, e.toString());
+        if (requestCode == REQ_ONE_TAP) {
+            try {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                if (account != null) {
+                    String idToken = account.getIdToken();
+                    String email = account.getEmail();
+                    Log.d(TAG, "Google Sign-In successful. Email: " + email + " Token: " + idToken);
+
+                    statusMessage.setText("Login successful!");
+                    statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                 }
-                break;
+            } catch (ApiException e) {
+                Log.e(TAG, "Google Sign-In failed.", e);
+                statusMessage.setText("Google Sign-In failed.");
+                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            }
         }
     }
 }
