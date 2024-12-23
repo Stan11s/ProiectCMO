@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "75773162299",
+    "project_id": "cmoproject2",
+    "storage_bucket": "cmoproject2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75773162299:android:f4eb60a1feef55676fbd1e",
+        "android_client_info": {
+          "package_name": "com.example.cmo2project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEZnrGNVdG2n2_oVDClhe7kUW96k5lZ_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75773162299:android:bad9a4890abbb03d6fbd1e",
+        "android_client_info": {
+          "package_name": "com.example.poriectcmocheltuieli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEZnrGNVdG2n2_oVDClhe7kUW96k5lZ_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
