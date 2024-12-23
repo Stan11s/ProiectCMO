@@ -10,9 +10,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,15 +26,21 @@ public class WelcomeActivity extends AppCompatActivity {
     private Button logoutButton;
     private Button addDataButton;
     private Button fetchDataButton;
-    private TextView displayDataText; // TextView pentru a afisa datele
+    private TextView displayDataText;
 
-    // Firestore instance
+    // Firebase instance
     private FirebaseFirestore db;
+
+    // GoogleSignInClient
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        // Inițializează Firestore
+        db = FirebaseFirestore.getInstance();
 
         welcomeMessage = findViewById(R.id.welcomeMessage);
         logoutButton = findViewById(R.id.logoutButton);
@@ -38,69 +48,78 @@ public class WelcomeActivity extends AppCompatActivity {
         fetchDataButton = findViewById(R.id.fetchDataButton);
         displayDataText = findViewById(R.id.displayDataText);
 
-        // Inițializează Firestore
-        db = FirebaseFirestore.getInstance();
+        // Configurarea Google SignIn
+        mGoogleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN);
 
-        // Obține numele utilizatorului transmis prin Intent
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
+        String userId = null;
+        String username = null;
 
-        welcomeMessage.setText("Salut, " + username + "!");
+        // Verificăm dacă utilizatorul este conectat cu Firebase Authentication
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // UID Firebase
+            username = FirebaseAuth.getInstance().getCurrentUser().getEmail(); // Email-ul utilizatorului
+        } else {
+            // Verificăm dacă utilizatorul este conectat cu Google Sign-In
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+            if (account != null) {
+                userId = account.getId(); // ID Google
+                username = account.getDisplayName(); // Nume utilizator
+            }
+        }
+
+        // Dacă un utilizator este autentificat
+        if (userId != null) {
+            welcomeMessage.setText("Salut, " + username + " (ID: " + userId + ")");
+
+            // Adaugă date în Firestore
+            String finalUserId = userId; // Trebuie să fie `final` pentru a putea fi folosit în lambda
+            addDataButton.setOnClickListener(v -> addDataToFirestore(finalUserId));
+
+            // Preia date din Firestore
+            fetchDataButton.setOnClickListener(v -> fetchDataFromFirestore(finalUserId));
+        }
 
         // Logout
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Ștergem starea autentificării
-                SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-                sharedPreferences.edit().putBoolean("isLoggedIn", false).apply();
+        logoutButton.setOnClickListener(v -> {
+            // Ștergem starea autentificării din SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            sharedPreferences.edit().putBoolean("isLoggedIn", false).apply();
 
-                // Redirecționăm utilizatorul la ecranul de login
+            // Deconectare utilizator Firebase Authentication
+            FirebaseAuth.getInstance().signOut();
+
+            // Deconectare utilizator Google Sign-In
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
                 Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-            }
-        });
-
-        // Adaugă date în Firestore la apăsarea butonului
-        addDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addDataToFirestore();
-            }
-        });
-
-        // Preia date din Firestore la apăsarea butonului
-        fetchDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fetchDataFromFirestore();
-            }
+            });
         });
     }
 
-    // Metoda pentru a adăuga date în Firestore
-    private void addDataToFirestore() {
+
+    // Metoda pentru a adăuga date în Firestore pentru utilizatorul curent
+    private void addDataToFirestore(String userId) {
         // Creează un HashMap cu datele pe care vrei să le adaugi
         Map<String, Object> cumparaturi = new HashMap<>();
         cumparaturi.put("produs", "Banane");
         cumparaturi.put("cantitate", 5);
         cumparaturi.put("pret", 3.50);
 
-        // Adaugă datele în colecția "Cumparaturi"
-        db.collection("Cumparaturi")
+        // Adaugă datele în colecția "Users" -> ID-ul utilizatorului -> "Cumparaturi"
+        db.collection("Users")
+                .document(userId)  // Creăm un document pentru fiecare utilizator cu ID-ul lor
+                .collection("Cumparaturi")
                 .add(cumparaturi)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Document adăugat cu ID-ul: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Firestore", "Eroare la adăugare: " + e.getMessage());
-                });
+                .addOnSuccessListener(documentReference -> Log.d("Firestore", "Document adăugat cu ID-ul: " + documentReference.getId()))
+                .addOnFailureListener(e -> Log.e("Firestore", "Eroare la adăugare: " + e.getMessage()));
     }
 
-    // Metoda pentru a prelua datele din Firestore și a le afisa
-    private void fetchDataFromFirestore() {
-        db.collection("Cumparaturi")
+    // Metoda pentru a prelua datele din Firestore pentru utilizatorul curent
+    private void fetchDataFromFirestore(String userId) {
+        db.collection("Users")
+                .document(userId)  // Accesăm documentul corespunzător utilizatorului
+                .collection("Cumparaturi")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
