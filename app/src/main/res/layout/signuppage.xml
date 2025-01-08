@@ -5,36 +5,66 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     tools:context=".SignUpActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp" />
 
     <EditText
         android:id="@+id/signup_username"
         android:layout_width="0dp"
         android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:hint="Username"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/custom_edit_text"
+        android:padding="12dp"
+        android:textColor="@color/text_color"
+        android:textColorHint="@color/hint_color"
+        app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        app:layout_constraintHorizontal_bias="0.5" />
+        android:layout_marginTop="16dp" />
 
     <EditText
         android:id="@+id/signup_password"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:hint="Password"
+        android:background="@drawable/custom_edit_text"
+        android:padding="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/text_color"
+        android:textColorHint="@color/hint_color"
         android:inputType="textPassword"
         app:layout_constraintTop_toBottomOf="@id/signup_username"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-
         android:layout_marginTop="12dp" />
 
     <EditText
         android:id="@+id/confirm_password"
         android:layout_width="0dp"
         android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:hint="Confirm Password"
+        android:background="@drawable/custom_edit_text"
+        android:padding="12dp"
+        android:textColor="@color/text_color"
+        android:textColorHint="@color/hint_color"
         android:inputType="textPassword"
         app:layout_constraintTop_toBottomOf="@id/signup_password"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,9 +73,13 @@
 
     <Button
         android:id="@+id/signupButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Sign Up"
+        android:textColor="@color/primary_color"
+        android:background="@drawable/custom_outline_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/confirm_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,6 +90,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
+        android:textColor="@color/error_color"
         app:layout_constraintTop_toBottomOf="@id/signupButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
