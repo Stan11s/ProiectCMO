@@ -171,13 +171,30 @@ public class WelcomeActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_expenses) {
-            // Setăm layout-ul la calendar.xml
-            Intent intent = new Intent(this, CalendarActivity.class);
-            startActivity(intent);
+            // Verificăm dacă utilizatorul este conectat
+            String userId = null;
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            } else {
+                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+                if (account != null) {
+                    userId = account.getId();
+                }
+            }
+
+            if (userId != null) {
+                // Transmitem userId către CalendarActivity
+                Intent intent = new Intent(this, CalendarActivity.class);
+                intent.putExtra("userId", userId); // Transmitem userId ca extra
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Eroare: Nu s-a găsit utilizatorul autentificat!", Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
-
 android {
     namespace = "com.example.poriectcmocheltuieli"
     compileSdk = 34
@@ -54,5 +53,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth:22.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
 
 }
