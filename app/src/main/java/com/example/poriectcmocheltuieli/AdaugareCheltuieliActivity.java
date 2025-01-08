@@ -2,6 +2,7 @@ package com.example.poriectcmocheltuieli;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,19 +33,22 @@ public class AdaugareCheltuieliActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         // Inițializare Firestore
         db = FirebaseFirestore.getInstance();
 
-        // Obțin userId transmis prin Intent
+        // Obținem userId transmis prin Intent
         userId = getIntent().getStringExtra("userId");
-
         if (userId == null) {
+            Log.e("AdaugareCheltuieli", "Eroare: userId este null!");
             Toast.makeText(this, "Eroare: Nu există userId!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Referințe la elementele UI
+        Log.d("AdaugareCheltuieli", "userId: " + userId);
+
+        // Inițializare elemente UI
         editTextDescriere = findViewById(R.id.descriptionEditText);
         editTextSuma = findViewById(R.id.amountEditText);
         btnSalvare = findViewById(R.id.addButton);
@@ -53,10 +57,11 @@ public class AdaugareCheltuieliActivity extends BaseActivity {
         btnSalvare.setOnClickListener(v -> salvareCheltuiala());
     }
 
+
     private void salvareCheltuiala() {
         String descriere = editTextDescriere.getText().toString().trim();
         String sumaString = editTextSuma.getText().toString().trim();
-        String data = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+        Date data = new Date();
 
         // Validare date
         if (TextUtils.isEmpty(descriere)) {
@@ -76,6 +81,7 @@ public class AdaugareCheltuieliActivity extends BaseActivity {
             editTextSuma.setError("Suma trebuie să fie un număr valid!");
             return;
         }
+
         // Creăm un obiect pentru salvare în Firestore
         Map<String, Object> cheltuiala = new HashMap<>();
         cheltuiala.put("description", descriere);
@@ -88,11 +94,18 @@ public class AdaugareCheltuieliActivity extends BaseActivity {
                 .collection("Cumparaturi")
                 .add(cheltuiala)
                 .addOnSuccessListener(documentReference -> {
+                    Log.d("AdaugareCheltuieli", "Cheltuială salvată cu succes: " + documentReference.getId());
+
                     Toast.makeText(this, "Cheltuială adăugată cu succes!", Toast.LENGTH_SHORT).show();
-                    finish();
+
+                    editTextDescriere.setText("");
+                    editTextSuma.setText("");
                 })
                 .addOnFailureListener(e -> {
+                    Log.e("AdaugareCheltuieli", "Eroare la salvare: " + e.getMessage(), e);
                     Toast.makeText(this, "Eroare la salvare: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+
 }

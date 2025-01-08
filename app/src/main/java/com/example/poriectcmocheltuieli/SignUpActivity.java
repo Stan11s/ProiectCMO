@@ -32,28 +32,49 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         signUpButton.setOnClickListener(v -> {
-            String username = signupUsername.getText().toString();
-            String password = signupPassword.getText().toString();
-            String confirmPasswordText = confirmPassword.getText().toString();
+            String username = signupUsername.getText().toString().trim();
+            String password = signupPassword.getText().toString().trim();
+            String confirmPasswordText = confirmPassword.getText().toString().trim();
 
-            if (password.equals(confirmPasswordText)) {
-                // Înregistrare utilizator în Firebase Authentication
-                mAuth.createUserWithEmailAndPassword(username, password)
-                        .addOnCompleteListener(SignUpActivity.this, task -> {
-                            if (task.isSuccessful()) {
-                                // Înregistrare reușită, navigăm la LoginActivity
-                                Toast.makeText(SignUpActivity.this, "User created successfully", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();  // Închide activitatea de înregistrare
-                            } else {
-                                // Eroare la înregistrare
-                                Toast.makeText(SignUpActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            } else {
-                Toast.makeText(SignUpActivity.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
+            // Verific dacă toate campurile sunt completate
+            if (username.isEmpty()) {
+                signupUsername.setError("Username is required!");
+                signupUsername.requestFocus();
+                return;
             }
+
+            if (password.isEmpty()) {
+                signupPassword.setError("Password is required!");
+                signupPassword.requestFocus();
+                return;
+            }
+
+            if (confirmPasswordText.isEmpty()) {
+                confirmPassword.setError("Confirm Password is required!");
+                confirmPassword.requestFocus();
+                return;
+            }
+
+            // Verific dacă parolele se potrivesc
+            if (!password.equals(confirmPasswordText)) {
+                Toast.makeText(SignUpActivity.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Înregistrare utilizator în Firebase Authentication
+            mAuth.createUserWithEmailAndPassword(username, password)
+                    .addOnCompleteListener(SignUpActivity.this, task -> {
+                        if (task.isSuccessful()) {
+                            // Înregistrare reușită, navigăm la LoginActivity
+                            Toast.makeText(SignUpActivity.this, "User created successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();  // Închide activitatea de înregistrare
+                        } else {
+                            // Eroare la înregistrare
+                            Toast.makeText(SignUpActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
     }
 }

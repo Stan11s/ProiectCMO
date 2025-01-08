@@ -81,13 +81,6 @@ public class WelcomeActivity extends AppCompatActivity {
         // Dacă un utilizator este autentificat
         if (userId != null) {
             welcomeMessage.setText("Salut, " + username);
-
-            // Adaugă date în Firestore
-            String finalUserId = userId; // Trebuie să fie `final` pentru a putea fi folosit în lambda
-            addDataButton.setOnClickListener(v -> addDataToFirestore(finalUserId));
-
-            // Preia date din Firestore
-            fetchDataButton.setOnClickListener(v -> fetchDataFromFirestore(finalUserId));
         }
 
         // Logout
@@ -106,60 +99,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 finish();
             });
         });
-    }
-
-
-    // Metoda pentru a adăuga date în Firestore pentru utilizatorul curent
-    private void addDataToFirestore(String userId) {
-        // Creează un HashMap cu datele pe care vrei să le adaugi
-        Map<String, Object> cumparaturi = new HashMap<>();
-        cumparaturi.put("produs", "Banane");
-        cumparaturi.put("cantitate", 5);
-        cumparaturi.put("pret", 3.50);
-        cumparaturi.put("data", com.google.firebase.Timestamp.now());
-
-        // Adaugă datele în colecția "Users" -> ID-ul utilizatorului -> "Cumparaturi"
-        db.collection("Users")
-                .document(userId)  // Creăm un document pentru fiecare utilizator cu ID-ul lor
-                .collection("Cumparaturi")
-                .add(cumparaturi)
-                .addOnSuccessListener(documentReference -> Log.d("Firestore", "Document adăugat cu ID-ul: " + documentReference.getId()))
-                .addOnFailureListener(e -> Log.e("Firestore", "Eroare la adăugare: " + e.getMessage()));
-    }
-
-    // Metoda pentru a prelua datele din Firestore pentru utilizatorul curent
-    private void fetchDataFromFirestore(String userId) {
-        db.collection("Users")
-                .document(userId)  // Accesăm documentul corespunzător utilizatorului
-                .collection("Cumparaturi")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        StringBuilder displayData = new StringBuilder();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String produs = document.getString("produs");
-                            Long cantitate = document.getLong("cantitate");
-                            Double pret = document.getDouble("pret");
-                            Date data =document.getDate(("data"));
-
-                            String dataFormatata = "";
-                            if (data != null) {
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                dataFormatata = sdf.format(data);
-                            }
-                            // Adaugă datele într-un StringBuilder pentru a le afisa
-                            displayData.append("Produs: ").append(produs)
-                                    .append(", Cantitate: ").append(cantitate)
-                                    .append(", Pret: ").append(pret)
-                                    .append(", Data: ").append(dataFormatata)
-                                    .append("\n");
-                        }
-                        // Afișează datele în TextView
-                        displayDataText.setText(displayData.toString());
-                    } else {
-                        Log.e("Firestore", "Eroare la preluare: " + task.getException().getMessage());
-                    }
-                });
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
