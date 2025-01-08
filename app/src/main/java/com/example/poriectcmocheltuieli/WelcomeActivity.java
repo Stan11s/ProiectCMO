@@ -53,9 +53,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
         welcomeMessage = findViewById(R.id.welcomeMessage);
         logoutButton = findViewById(R.id.logoutButton);
-        addDataButton = findViewById(R.id.addDataButton);
-        fetchDataButton = findViewById(R.id.fetchDataButton);
-        displayDataText = findViewById(R.id.displayDataText);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
