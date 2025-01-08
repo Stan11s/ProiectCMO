@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -17,8 +18,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -47,6 +55,8 @@ public class WelcomeActivity extends AppCompatActivity {
         addDataButton = findViewById(R.id.addDataButton);
         fetchDataButton = findViewById(R.id.fetchDataButton);
         displayDataText = findViewById(R.id.displayDataText);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Configurarea Google SignIn
         mGoogleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN);
@@ -69,7 +79,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Dacă un utilizator este autentificat
         if (userId != null) {
-            welcomeMessage.setText("Salut, " + username + " (ID: " + userId + ")");
+            welcomeMessage.setText("Salut, " + username);
 
             // Adaugă date în Firestore
             String finalUserId = userId; // Trebuie să fie `final` pentru a putea fi folosit în lambda
@@ -105,6 +115,7 @@ public class WelcomeActivity extends AppCompatActivity {
         cumparaturi.put("produs", "Banane");
         cumparaturi.put("cantitate", 5);
         cumparaturi.put("pret", 3.50);
+        cumparaturi.put("data", com.google.firebase.Timestamp.now());
 
         // Adaugă datele în colecția "Users" -> ID-ul utilizatorului -> "Cumparaturi"
         db.collection("Users")
@@ -128,11 +139,18 @@ public class WelcomeActivity extends AppCompatActivity {
                             String produs = document.getString("produs");
                             Long cantitate = document.getLong("cantitate");
                             Double pret = document.getDouble("pret");
+                            Date data =document.getDate(("data"));
 
+                            String dataFormatata = "";
+                            if (data != null) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                dataFormatata = sdf.format(data);
+                            }
                             // Adaugă datele într-un StringBuilder pentru a le afisa
                             displayData.append("Produs: ").append(produs)
                                     .append(", Cantitate: ").append(cantitate)
                                     .append(", Pret: ").append(pret)
+                                    .append(", Data: ").append(dataFormatata)
                                     .append("\n");
                         }
                         // Afișează datele în TextView
@@ -142,4 +160,24 @@ public class WelcomeActivity extends AppCompatActivity {
                     }
                 });
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_expenses) {
+            // Setăm layout-ul la calendar.xml
+            Intent intent = new Intent(this, CalendarActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

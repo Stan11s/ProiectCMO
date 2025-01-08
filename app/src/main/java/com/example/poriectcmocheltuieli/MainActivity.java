@@ -84,7 +84,20 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(v -> {
             String email = usernameField.getText().toString();
             String password = passwordField.getText().toString();
+            if (email.equals("test") && password.equals("test")) {
+                statusMessage.setText("Login Successful (Test Mode)");
+                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
 
+                // Salvăm starea autentificării
+                SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                sharedPreferences.edit()
+                        .putBoolean("isLoggedIn", true)
+                        .putString("username", "test@test.com") // Simulăm un email pentru testare
+                        .apply();
+
+                navigateToWelcomePage("test@test.com"); // Navigare către WelcomeActivity
+                return; // Ne asigurăm că Firebase Auth nu este apelat
+            }
             if (email.isEmpty() || password.isEmpty()) {
                 statusMessage.setText("Please fill in all fields");
                 statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));

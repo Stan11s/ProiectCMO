@@ -21,6 +21,7 @@
         <activity
             android:name="com.example.poriectcmocheltuieli.MainActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,6 +31,10 @@
         <!-- Activitatea de înregistrare -->
         <activity android:name="com.example.poriectcmocheltuieli.SignUpActivity" />
         <activity android:name="com.example.poriectcmocheltuieli.WelcomeActivity" />
+        <activity
+            android:name="com.example.poriectcmocheltuieli.CalendarActivity"/>
+
+
     </application>
 
 </manifest>
