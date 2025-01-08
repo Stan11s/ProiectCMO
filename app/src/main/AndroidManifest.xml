@@ -33,6 +33,8 @@
         <activity android:name="com.example.poriectcmocheltuieli.WelcomeActivity" />
         <activity
             android:name="com.example.poriectcmocheltuieli.CalendarActivity"/>
+        <activity
+            android:name="com.example.poriectcmocheltuieli.AdaugareCheltuieliActivity"/>
 
 
     </application>

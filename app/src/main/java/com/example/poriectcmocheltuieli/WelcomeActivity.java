@@ -36,6 +36,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private Button fetchDataButton;
     private TextView displayDataText;
 
+
     // Firebase instance
     private FirebaseFirestore db;
 
@@ -185,6 +186,29 @@ public class WelcomeActivity extends AppCompatActivity {
             if (userId != null) {
                 // Transmitem userId către CalendarActivity
                 Intent intent = new Intent(this, CalendarActivity.class);
+                intent.putExtra("userId", userId); // Transmitem userId ca extra
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Eroare: Nu s-a găsit utilizatorul autentificat!", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+        if(id == R.id.action_add_expense)
+        {
+            // Verificăm dacă utilizatorul este conectat
+            String userId = null;
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            } else {
+                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+                if (account != null) {
+                    userId = account.getId();
+                }
+            }
+
+            if (userId != null) {
+                // Transmitem userId către CalendarActivity
+                Intent intent = new Intent(this, AdaugareCheltuieliActivity.class);
                 intent.putExtra("userId", userId); // Transmitem userId ca extra
                 startActivity(intent);
             } else {
