@@ -124,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             navigateToWelcomePage(currentUser.getEmail());
         }
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            navigateToWelcomePage(account.getEmail());
+        }
     }
 
     private void navigateToWelcomePage(String username) {

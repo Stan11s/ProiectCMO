@@ -51,6 +51,7 @@ public class CalendarActivity extends BaseActivity {
     private List<Expense> allExpenses;
     private String selectedMode = "day";
     private FirebaseFirestore db;
+    private TextView totalExpenseTextView;
     private String userId="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,8 @@ public class CalendarActivity extends BaseActivity {
         monthButton.setOnClickListener(v -> filterExpensesByMonth());
         openChartButton.setOnClickListener(v -> openChart());
         openBarChartButton.setOnClickListener(v -> openBarChart());
+        //totalul pe anumite zile/sapt/luni;
+        totalExpenseTextView = findViewById(R.id.total_expense_text);
 
     }
 
@@ -239,6 +242,13 @@ public class CalendarActivity extends BaseActivity {
     private void updateRecyclerView(List<Expense> filteredExpenses) {
         adapter = new ExpenseAdapter(filteredExpenses);
         recyclerView.setAdapter(adapter);
+        double totalAmount = 0.0;
+        for (Expense expense : filteredExpenses) {
+            totalAmount += expense.getAmount();
+        }
+
+        // Actualizăm TextView-ul cu suma totală
+        totalExpenseTextView.setText(String.format("Total Cheltuieli: %.2f RON", totalAmount));
     }
     private void openChart() {
         // Verificăm dacă există o dată selectată
@@ -383,9 +393,12 @@ public class CalendarActivity extends BaseActivity {
         Button openChartButton = findViewById(R.id.btn_open_chart);
         Button openBarChartButton = findViewById(R.id.btn_open_barchart);
 
-        // Configurăm RecyclerView
-        recyclerView = findViewById(R.id.recycler_view);
+                // Configurăm RecyclerView
+                recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Reinițializăm referința la TextView pentru suma totală
+        totalExpenseTextView = findViewById(R.id.total_expense_text);
 
         // Refacem listener-ele pentru butoane
         openCalendarButton.setOnClickListener(v -> openDatePicker());

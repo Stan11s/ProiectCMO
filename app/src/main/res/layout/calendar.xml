@@ -91,5 +91,17 @@
             android:visibility="gone" />
 
     </FrameLayout>
+    <TextView
+        android:id="@+id/total_expense_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="Total Cheltuieli: 0 RON"
+        android:textSize="18sp"
+        android:background="#EAEAEA"
+        android:padding="8dp"
+        android:layout_alignParentBottom="true" />
 
 </LinearLayout>
+
