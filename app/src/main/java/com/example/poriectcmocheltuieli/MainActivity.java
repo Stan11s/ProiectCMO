@@ -5,34 +5,25 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.Identity;
-import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
-    private SignInClient oneTapClient;
-    private BeginSignInRequest signInRequest;
     private EditText usernameField, passwordField;
-    private Button loginButton;
-    private TextView statusMessage;
-    private Button signUpButton;
     private GoogleSignInClient googleSignInClient;
 
     private FirebaseAuth firebaseAuth; // Adăugare Firebase Auth
@@ -46,9 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
         usernameField = findViewById(R.id.username);
         passwordField = findViewById(R.id.password);
-        loginButton = findViewById(R.id.loginButton);
-        statusMessage = findViewById(R.id.statusMessage);
-        signUpButton = findViewById(R.id.signUpButton);
+        Button loginButton = findViewById(R.id.loginButton);
+        Button signUpButton = findViewById(R.id.signUpButton);
 
         // Inițializare Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
@@ -62,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         // Inițializează variabila globală googleSignInClient
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        signInRequest = BeginSignInRequest.builder()
+        // Permite toate conturile
+        BeginSignInRequest signInRequest = BeginSignInRequest.builder()
                 .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
                         .setSupported(true)
                         .build())
@@ -84,23 +75,24 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(v -> {
             String email = usernameField.getText().toString();
             String password = passwordField.getText().toString();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Test Mode pentru autentificare rapidă
             if (email.equals("test") && password.equals("test")) {
-                statusMessage.setText("Login Successful (Test Mode)");
-                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                Toast.makeText(this, "Login Successful (Test Mode)", Toast.LENGTH_SHORT).show();
 
                 // Salvăm starea autentificării
                 SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 sharedPreferences.edit()
                         .putBoolean("isLoggedIn", true)
-                        .putString("username", "test@test.com") // Simulăm un email pentru testare
+                        .putString("username", "test@test.com")
                         .apply();
 
-                navigateToWelcomePage("test@test.com"); // Navigare către WelcomeActivity
-                return; // Ne asigurăm că Firebase Auth nu este apelat
-            }
-            if (email.isEmpty() || password.isEmpty()) {
-                statusMessage.setText("Please fill in all fields");
-                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                navigateToWelcomePage("test@test.com");
                 return;
             }
 
@@ -110,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             if (user != null) {
-                                statusMessage.setText("Login Successful");
-                                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
 
                                 // Salvăm starea autentificării
                                 SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -123,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
                                 navigateToWelcomePage(user.getEmail());
                             }
                         } else {
-                            statusMessage.setText("Invalid Credentials");
-                            statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                            Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
@@ -159,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (account != null) {
                     String email = account.getEmail();
+                    Toast.makeText(this, "Google Sign-In successful: " + email, Toast.LENGTH_SHORT).show();
 
                     // Salvăm starea autentificării
                     SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -171,9 +162,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (ApiException e) {
                 Log.e("TAG", "Google Sign-In failed.", e);
-                statusMessage.setText("Google Sign-In failed.");
-                statusMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+}
 }

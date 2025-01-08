@@ -1,5 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Background and Primary Colors -->
+    <color name="background_color">#F5F5F5</color>
+    <color name="primary_color">#6200EE</color>
+    <color name="primary_color_dark">#3700B3</color>
+    <color name="primary_color_light">#BB86FC</color>
+
+    <!-- Text Colors -->
+    <color name="text_color">#000000</color>
+    <color name="hint_color">#757575</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Error Color -->
+    <color name="error_color">#B00020</color>
+
+    <!-- Additional Colors -->
+    <color name="accent_color">#03DAC5</color>
 </resources>
