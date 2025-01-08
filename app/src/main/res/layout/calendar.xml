@@ -53,6 +53,20 @@
         android:layout_marginTop="16dp"
         android:text="Open Calendar" />
 
+    <!--Chart button-->
+    <Button
+        android:id="@+id/btn_open_chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Open Chart" />
+    <Button
+        android:id="@+id/btn_open_barchart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Open Bar-Chart" />
+
     <!-- Content Area -->
     <FrameLayout
         android:id="@+id/content_container"
@@ -77,4 +91,5 @@
             android:visibility="gone" />
 
     </FrameLayout>
+
 </LinearLayout>
