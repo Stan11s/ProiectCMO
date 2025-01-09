@@ -16,7 +16,7 @@ public class Expense {
         return date;
     }
 
-    // Setter pentru data (opțional, doar dacă este necesar)
+    // Setter pentru data
     public void setDate(String date) {
         this.date = date;
     }
@@ -26,17 +26,17 @@ public class Expense {
         return description;
     }
 
-    // Setter pentru descriere (opțional, doar dacă este necesar)
+    // Setter pentru descriere
     public void setDescription(String description) {
         this.description = description;
     }
 
-    // Getter pentru sumă
+    // Getter pentru suma
     public double getAmount() {
         return amount;
     }
 
-    // Setter pentru sumă
+    // Setter pentru suma
     public void setAmount(double amount) {
         this.amount = amount;
     }

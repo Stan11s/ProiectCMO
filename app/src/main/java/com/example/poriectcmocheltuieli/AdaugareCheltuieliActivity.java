@@ -82,13 +82,13 @@ public class AdaugareCheltuieliActivity extends BaseActivity {
             return;
         }
 
-        // Creăm un obiect pentru salvare în Firestore
+        // Creare un obiect pentru salvare în Firestore
         Map<String, Object> cheltuiala = new HashMap<>();
         cheltuiala.put("description", descriere);
         cheltuiala.put("amount", suma);
         cheltuiala.put("date", data);
 
-        // Salvăm cheltuiala în Firestore
+        // Salvare cheltuiala în Firestore
         db.collection("Users")
                 .document(userId)
                 .collection("Cumparaturi")

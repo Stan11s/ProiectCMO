@@ -57,7 +57,7 @@ public class CalendarActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar);
-        //initializam firebase
+        //initializare firebase
         db = FirebaseFirestore.getInstance();
         allExpenses = new ArrayList<>();
         // Configurare Toolbar
@@ -66,7 +66,7 @@ public class CalendarActivity extends BaseActivity {
         userId = getIntent().getStringExtra("userId");
 
         if (userId != null) {
-            fetchDataFromFirestore(userId); // Preia datele din Firestore utilizând userId
+            fetchDataFromFirestore(userId);
         } else {
             Toast.makeText(this, "Eroare: Nu s-a primit userId!", Toast.LENGTH_SHORT).show();
         }
@@ -74,9 +74,6 @@ public class CalendarActivity extends BaseActivity {
         // Configurare RecyclerView
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Generăm cheltuieli exemplu
-        //allExpenses = generateMockExpenses();
 
         // Configurare butoane
         Button openCalendarButton = findViewById(R.id.btn_open_calendar);
@@ -120,18 +117,18 @@ public class CalendarActivity extends BaseActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Formatează data selectată în formatul "dd/MM/yyyy"
+                    // Formatare  data selectată în formatul "dd/MM/yyyy"
                     Calendar selectedCalendar = Calendar.getInstance();
                     selectedCalendar.set(Calendar.YEAR, selectedYear);
                     selectedCalendar.set(Calendar.MONTH, selectedMonth);
                     selectedCalendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    selectedDate = sdf.format(selectedCalendar.getTime()); // Formatează data selectată
+                    selectedDate = sdf.format(selectedCalendar.getTime());
 
                     Toast.makeText(this, "Data selectată: " + selectedDate, Toast.LENGTH_SHORT).show();
 
-                    // Actualizează vizualizarea pentru modul curent
+                    // Actualizare vizualizarea pentru modul curent
                     updateViewBasedOnMode();
                 },
                 year,
@@ -164,29 +161,28 @@ public class CalendarActivity extends BaseActivity {
             return;
         }
 
-        // Spargem `selectedDate` în zi, lună și an
         String[] dateParts = selectedDate.split("/");
         int selectedDay = Integer.parseInt(dateParts[0]);
-        int selectedMonth = Integer.parseInt(dateParts[1]) - 1; // Calendar folosește lunile de la 0
+        int selectedMonth = Integer.parseInt(dateParts[1]) - 1;
         int selectedYear = Integer.parseInt(dateParts[2]);
 
-        // Configurăm Calendar pentru data selectată
+        // Configurare Calendar pentru data selectată
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, selectedYear);
         calendar.set(Calendar.MONTH, selectedMonth);
         calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-        // Calculăm începutul săptămânii (luni)
+        // Calculam inceputul saptamanii (luni)
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
             calendar.add(Calendar.DAY_OF_MONTH, -1);
         }
         Calendar startOfWeek = (Calendar) calendar.clone(); // Luni
 
-        // Calculăm sfârșitul săptămânii (duminică)
+        // Calculam sfarsitul saptamanii (duminica)
         calendar.add(Calendar.DAY_OF_MONTH, 6);
         Calendar endOfWeek = (Calendar) calendar.clone(); // Duminică
 
-        // Filtrăm cheltuielile pentru săptămână
+        // Filtram cheltuielile pentru saptamana
         List<Expense> filteredExpenses = new ArrayList<>();
         for (Expense expense : allExpenses) {
             String[] expenseDateParts = expense.getDate().split("/");
@@ -199,16 +195,15 @@ public class CalendarActivity extends BaseActivity {
             expenseCalendar.set(Calendar.MONTH, expenseMonth);
             expenseCalendar.set(Calendar.DAY_OF_MONTH, expenseDay);
 
-            // Adăugăm cheltuiala dacă se află între începutul și sfârșitul săptămânii
+            // Adaugam cheltuiala dacă se afla intre începutul și sfarsitul saptamanii
             if (!expenseCalendar.before(startOfWeek) && !expenseCalendar.after(endOfWeek)) {
                 filteredExpenses.add(expense);
             }
         }
 
-        // Actualizăm RecyclerView cu cheltuielile filtrate
+        // Actualizare RecyclerView cu cheltuielile filtrate
         updateRecyclerView(filteredExpenses);
 
-        // Afișăm perioada săptămânii pentru debug
         String weekRange = "Perioada săptămânii: " +
                 startOfWeek.get(Calendar.DAY_OF_MONTH) + "/" +
                 (startOfWeek.get(Calendar.MONTH) + 1) + "/" +
@@ -247,11 +242,11 @@ public class CalendarActivity extends BaseActivity {
             totalAmount += expense.getAmount();
         }
 
-        // Actualizăm TextView-ul cu suma totală
+        // Actualizare TextView-ul cu suma totala
         totalExpenseTextView.setText(String.format("Total Cheltuieli: %.2f RON", totalAmount));
     }
     private void openChart() {
-        // Verificăm dacă există o dată selectată
+        // Verificare daca exista o data selectata
         if (selectedDate == null || selectedDate.isEmpty()) {
             Toast.makeText(this, "Selectați o dată din calendar!", Toast.LENGTH_SHORT).show();
             return;
@@ -285,7 +280,7 @@ public class CalendarActivity extends BaseActivity {
             return;
         }
 
-        // Agregăm cheltuielile pe baza datei
+        // Agregam cheltuielile pe baza datei
         Map<String, List<Expense>> expensesByDate = new HashMap<>();
         for (Expense expense : filteredExpenses) {
             String date = expense.getDate();
@@ -295,7 +290,7 @@ public class CalendarActivity extends BaseActivity {
 
         setContentView(R.layout.chart);
 
-        // Referințe pentru PieChart și CardView
+        // Referinte pentru PieChart si CardView
         PieChart pieChart = findViewById(R.id.pie_chart);
         CardView cardDetails = findViewById(R.id.card_details);
         TextView tvDate = findViewById(R.id.tv_date);
@@ -324,7 +319,7 @@ public class CalendarActivity extends BaseActivity {
         pieData.setValueTextColor(android.graphics.Color.BLACK);
         Button backButton = findViewById(R.id.btn_back);
 
-        // Configurăm butonul Back
+        // Configuram butonul Back
         backButton.setOnClickListener(v -> {
             // Ne întoarcem la layout-ul anterior
             setupMainLayout();
@@ -352,7 +347,7 @@ public class CalendarActivity extends BaseActivity {
                 String selectedDate = ((PieEntry) e).getLabel();
                 List<Expense> selectedExpenses = expensesByDate.get(selectedDate);
 
-                // Populăm CardView cu detalii
+                // Populam CardView cu detalii
                 StringBuilder descriptionBuilder = new StringBuilder();
                 double totalAmount = 0.0;
 
@@ -365,7 +360,7 @@ public class CalendarActivity extends BaseActivity {
                 tvDescription.setText("Descriere:\n" + descriptionBuilder.toString());
                 tvAmount.setText("Total: " + String.format("%.2f RON", totalAmount));
 
-                // Afișăm CardView
+                // Afisam CardView
                 cardDetails.setVisibility(View.VISIBLE);
             }
 
@@ -378,14 +373,14 @@ public class CalendarActivity extends BaseActivity {
     }
 
     private void setupMainLayout() {
-        // Setăm layout-ul principal
+        // Setam layout-ul principal
         setContentView(R.layout.calendar);
 
-        // Reconfigurăm Toolbar-ul
+        // Reconfiguram Toolbar-ul
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Reconfigurăm butoanele
+        // Reconfiguram butoanele
         Button openCalendarButton = findViewById(R.id.btn_open_calendar);
         Button dayButton = findViewById(R.id.btn_day);
         Button weekButton = findViewById(R.id.btn_week);
@@ -393,11 +388,11 @@ public class CalendarActivity extends BaseActivity {
         Button openChartButton = findViewById(R.id.btn_open_chart);
         Button openBarChartButton = findViewById(R.id.btn_open_barchart);
 
-                // Configurăm RecyclerView
+                // Configuram RecyclerView
                 recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Reinițializăm referința la TextView pentru suma totală
+        // Reinitializam referinta la TextView pentru suma totală
         totalExpenseTextView = findViewById(R.id.total_expense_text);
 
         // Refacem listener-ele pentru butoane
@@ -429,7 +424,7 @@ public class CalendarActivity extends BaseActivity {
                 filterExpensesByMonth();
                 break;
             default:
-                // Dacă nu există mod selectat, nu facem nimic
+                // Daca nu exista mod selectat, nu facem nimic
                 break;
         }
     }
@@ -447,13 +442,12 @@ public class CalendarActivity extends BaseActivity {
         calendar.set(Calendar.MONTH, selectedMonth);
         calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-        // Determinăm începutul săptămânii (luni)
+        // Determinam inceputul saptamanii (luni)
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
             calendar.add(Calendar.DAY_OF_MONTH, -1);
         }
         Calendar startOfWeek = (Calendar) calendar.clone();
 
-        // Determinăm sfârșitul săptămânii (duminică)
         calendar.add(Calendar.DAY_OF_MONTH, 6);
         Calendar endOfWeek = (Calendar) calendar.clone();
 
@@ -492,7 +486,7 @@ public class CalendarActivity extends BaseActivity {
         return filteredExpenses;
     }
     private void openBarChart() {
-        // Verificăm dacă există o dată selectată
+        // Verificam dacă exista o dată selectata
         if (selectedDate == null || selectedDate.isEmpty()) {
             Toast.makeText(this, "Selectați o dată din calendar!", Toast.LENGTH_SHORT).show();
             return;
@@ -526,24 +520,23 @@ public class CalendarActivity extends BaseActivity {
             return;
         }
 
-        // Agregăm cheltuielile pe zile
-        Map<String, Double> aggregatedByDate = new TreeMap<>(); // TreeMap pentru sortare automată după dată
+        Map<String, Double> aggregatedByDate = new TreeMap<>(); // TreeMap pentru sortare automata după data
         for (Expense expense : filteredExpenses) {
             aggregatedByDate.put(expense.getDate(), aggregatedByDate.getOrDefault(expense.getDate(), 0.0) + expense.getAmount());
         }
 
-        // Pregătim datele pentru BarChart
+        // Pregatim datele pentru BarChart
         List<BarEntry> barEntries = new ArrayList<>();
         List<String> xAxisLabels = new ArrayList<>();
 
         int index = 0;
         for (Map.Entry<String, Double> entry : aggregatedByDate.entrySet()) {
             barEntries.add(new BarEntry(index, entry.getValue().floatValue()));
-            xAxisLabels.add(entry.getKey()); // Adăugăm data în lista de etichete
+            xAxisLabels.add(entry.getKey()); // Adaugam data în lista de etichete
             index++;
         }
 
-        // Afișăm graficul
+        // Afișam graficul
         setContentView(R.layout.bar_chart);
 
         BarChart barChart = findViewById(R.id.bar_chart);
@@ -552,7 +545,7 @@ public class CalendarActivity extends BaseActivity {
 
         Button backButton = findViewById(R.id.btn_backBarChart);
 
-        // Configurăm butonul Back
+        // Configuram butonul Back
         backButton.setOnClickListener(v -> {
             // Ne întoarcem la layout-ul anterior
             setupMainLayout();
@@ -561,21 +554,21 @@ public class CalendarActivity extends BaseActivity {
 
         BarData barData = new BarData(barDataSet);
         barData.setValueTextSize(12f);
-        barData.setBarWidth(0.9f); // Lățimea barurilor
+        barData.setBarWidth(0.9f); // Latimea barurilor
 
-        // Configurăm BarChart
+        // Configurare BarChart
         barChart.setData(barData);
         barChart.setFitBars(true);
         barChart.getDescription().setEnabled(false);
-        // Configurăm axa X pentru a afișa datele sortate
+        // Configurare axa X pentru a afișa datele sortate
         barChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                int index = Math.round(value); // Conversie float la int prin rotunjire
+                int index = Math.round(value);
                 if (index >= 0 && index < xAxisLabels.size()) {
-                    return xAxisLabels.get(index); // Returnăm eticheta corespunzătoare
+                    return xAxisLabels.get(index); // Returnam eticheta corespunzatoare
                 } else {
-                    return ""; // Returnăm un șir gol pentru valori invalide
+                    return ""; // Returnam un șir gol pentru valori invalide
                 }
             }
         });
@@ -583,7 +576,7 @@ public class CalendarActivity extends BaseActivity {
         barChart.getXAxis().setGranularityEnabled(true);
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
 
-        barChart.invalidate(); // Reîmprospătăm graficul
+        barChart.invalidate(); // Refresh graficul
     }
 
 
@@ -618,25 +611,20 @@ public class CalendarActivity extends BaseActivity {
         expenses.add(new Expense("28/2/2025", "Cadouri", 200.0));
 
 
-        // Harta pentru agregare (cheie: "dată + descriere", valoare: sumă totală)
         Map<String, Expense> aggregatedExpenses = new HashMap<>();
 
         for (Expense expense : expenses) {
             String key = expense.getDate() + "-" + expense.getDescription();
             if (aggregatedExpenses.containsKey(key)) {
-                // Dacă există deja o intrare, adunăm suma
                 Expense existingExpense = aggregatedExpenses.get(key);
                 existingExpense.setAmount(existingExpense.getAmount() + expense.getAmount());
             } else {
-                // Dacă nu există, o adăugăm
                 aggregatedExpenses.put(key, new Expense(expense.getDate(), expense.getDescription(), expense.getAmount()));
             }
         }
 
-        // Convertim harta în listă
         List<Expense> aggregatedList = new ArrayList<>(aggregatedExpenses.values());
 
-        // Sortăm lista după dată
         aggregatedList.sort((e1, e2) -> {
             String[] date1Parts = e1.getDate().split("/");
             String[] date2Parts = e2.getDate().split("/");
@@ -677,10 +665,10 @@ public class CalendarActivity extends BaseActivity {
                             }
                         }
 
-                        // Salvează toate cheltuielile fără să actualizezi RecyclerView
+                        // Salvare toate cheltuielile fara sa actualizezi RecyclerView
                         allExpenses = aggregateAndSortExpenses(expenses);
 
-                        // Poți să adaugi un log aici pentru a verifica că datele sunt preluate corect.
+
                         Log.d("fetchDataFromFirestore", "Datele au fost preluate: " + allExpenses.size());
                     } else {
                         Log.e("Firestore", "Eroare la preluare: " + task.getException().getMessage());
@@ -688,25 +676,25 @@ public class CalendarActivity extends BaseActivity {
                 });
     }
     private List<Expense> aggregateAndSortExpenses(List<Expense> expenses) {
-        // Harta pentru agregare (cheie: "dată + descriere", valoare: sumă totală)
+        // Harta pentru agregare (cheie: "dată + descriere", valoare: sumă totalăa)
         Map<String, Expense> aggregatedExpenses = new HashMap<>();
 
         for (Expense expense : expenses) {
             String key = expense.getDate() + "-" + expense.getDescription();
             if (aggregatedExpenses.containsKey(key)) {
-                // Dacă există deja o intrare, adunăm suma
+                // Daca există deja o intrare, adunăm suma
                 Expense existingExpense = aggregatedExpenses.get(key);
                 existingExpense.setAmount(existingExpense.getAmount() + expense.getAmount());
             } else {
-                // Dacă nu există, o adăugăm
+                // Daca nu exista, o adaugam
                 aggregatedExpenses.put(key, new Expense(expense.getDate(), expense.getDescription(), expense.getAmount()));
             }
         }
 
-        // Convertim harta în listă
+        // Convertim harta în lista
         List<Expense> aggregatedList = new ArrayList<>(aggregatedExpenses.values());
 
-        // Sortăm lista după dată
+        // Sortam lista după data
         aggregatedList.sort((e1, e2) -> {
             String[] date1Parts = e1.getDate().split("/");
             String[] date2Parts = e2.getDate().split("/");
@@ -744,5 +732,4 @@ public class CalendarActivity extends BaseActivity {
         }
     }
 
-    // Actualizare RecyclerView
 }

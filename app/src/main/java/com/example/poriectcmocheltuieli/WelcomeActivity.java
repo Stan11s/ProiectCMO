@@ -48,7 +48,7 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        // Inițializează Firestore
+        // Inițializare Firestore
         db = FirebaseFirestore.getInstance();
 
         welcomeMessage = findViewById(R.id.welcomeMessage);
@@ -62,12 +62,12 @@ public class WelcomeActivity extends AppCompatActivity {
         String userId = null;
         String username = null;
 
-        // Verificăm dacă utilizatorul este conectat cu Firebase Authentication
+        // Verificare daca utilizatorul este conectat cu Firebase Authentication
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // UID Firebase
             username = FirebaseAuth.getInstance().getCurrentUser().getEmail(); // Email-ul utilizatorului
         } else {
-            // Verificăm dacă utilizatorul este conectat cu Google Sign-In
+            // Verificare daca utilizatorul este conectat cu Google Sign-In
             GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
             if (account != null) {
                 userId = account.getId(); // ID Google
@@ -75,14 +75,14 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         }
 
-        // Dacă un utilizator este autentificat
+        // Daca un utilizator este autentificat
         if (userId != null) {
             welcomeMessage.setText("Salut, " + username);
         }
 
         // Logout
         logoutButton.setOnClickListener(v -> {
-            // Ștergem starea autentificării din SharedPreferences
+            // stergem starea autentificarii din SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             sharedPreferences.edit().putBoolean("isLoggedIn", false).apply();
 
@@ -108,7 +108,7 @@ public class WelcomeActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_expenses) {
-            // Verificăm dacă utilizatorul este conectat
+            // Verificam dacă utilizatorul este conectat
             String userId = null;
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -120,7 +120,7 @@ public class WelcomeActivity extends AppCompatActivity {
             }
 
             if (userId != null) {
-                // Transmitem userId către CalendarActivity
+                // Transmitem userId catre CalendarActivity
                 Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("userId", userId); // Transmitem userId ca extra
                 startActivity(intent);
@@ -131,7 +131,7 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         if(id == R.id.action_add_expense)
         {
-            // Verificăm dacă utilizatorul este conectat
+            // Verificam dacă utilizatorul este conectat
             String userId = null;
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -143,7 +143,7 @@ public class WelcomeActivity extends AppCompatActivity {
             }
 
             if (userId != null) {
-                // Transmitem userId către CalendarActivity
+                // Transmitem userId catre CalendarActivity
                 Intent intent = new Intent(this, AdaugareCheltuieliActivity.class);
                 intent.putExtra("userId", userId); // Transmitem userId ca extra
                 startActivity(intent);

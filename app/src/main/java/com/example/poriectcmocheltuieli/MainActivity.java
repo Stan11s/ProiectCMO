@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
 
-        // Inițializează variabila globală googleSignInClient
+        // Inițializare variabila globala googleSignInClient
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // Permite toate conturile
@@ -81,11 +81,11 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Test Mode pentru autentificare rapidă
+            // Test Mode pentru autentificare rapida
             if (email.equals("test") && password.equals("test")) {
                 Toast.makeText(this, "Login Successful (Test Mode)", Toast.LENGTH_SHORT).show();
 
-                // Salvăm starea autentificării
+                // Salvare starea autentificării
                 SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                 sharedPreferences.edit()
                         .putBoolean("isLoggedIn", true)
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     });
         });
 
-        // Verificăm dacă utilizatorul este deja autentificat
+        // Verificare daca utilizatorul este deja autentificat
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             navigateToWelcomePage(currentUser.getEmail());
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     String email = account.getEmail();
                     Toast.makeText(this, "Google Sign-In successful: " + email, Toast.LENGTH_SHORT).show();
 
-                    // Salvăm starea autentificării
+                    // Salvare starea autentificarii
                     SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                     sharedPreferences.edit()
                             .putBoolean("isLoggedIn", true)

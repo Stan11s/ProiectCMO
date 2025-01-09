@@ -28,7 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
         confirmPassword = findViewById(R.id.confirm_password);
         signUpButton = findViewById(R.id.signupButton);
 
-        // Inițializăm FirebaseAuth
+        // Initializam FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 
         signUpButton.setOnClickListener(v -> {
@@ -36,7 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
             String password = signupPassword.getText().toString().trim();
             String confirmPasswordText = confirmPassword.getText().toString().trim();
 
-            // Verific dacă toate campurile sunt completate
+            // Verific daca toate campurile sunt completate
             if (username.isEmpty()) {
                 signupUsername.setError("Username is required!");
                 signupUsername.requestFocus();
@@ -55,7 +55,7 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
 
-            // Verific dacă parolele se potrivesc
+            // Verific daca parolele se potrivesc
             if (!password.equals(confirmPasswordText)) {
                 Toast.makeText(SignUpActivity.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
                 return;
@@ -65,11 +65,11 @@ public class SignUpActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(username, password)
                     .addOnCompleteListener(SignUpActivity.this, task -> {
                         if (task.isSuccessful()) {
-                            // Înregistrare reușită, navigăm la LoginActivity
+                            // Înregistrare reusita, navigam la LoginActivity
                             Toast.makeText(SignUpActivity.this, "User created successfully", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(intent);
-                            finish();  // Închide activitatea de înregistrare
+                            finish();  // Închidem activitatea de înregistrare
                         } else {
                             // Eroare la înregistrare
                             Toast.makeText(SignUpActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
